@@ -7,7 +7,7 @@
 class MissileController
 {
 public:
-    void addMissile(const Missile& missile);
+    void addMissile(const Missile &missile);
     void moveAllMissiles(double dx, double dy, double dz);
     void printAllStatuses() const;
 

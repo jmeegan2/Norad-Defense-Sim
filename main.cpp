@@ -32,10 +32,10 @@ int main()
     Missile::Position launchPadB = {200.0, 75.0, 0.0};
     Missile::Position targetCity = {500.0, 1000.0, 0.0};
 
-    controller.addMissile(Missile(missileId++, 50, "Scud", 50.0, launchPadA, targetCity));
-    controller.addMissile(Missile(missileId++, 50, "Scud", 50.0, launchPadA, targetCity));
-    controller.addMissile(Missile(missileId++, 100, "Hellfire", 80.0, launchPadB, targetCity));
-    controller.addMissile(Missile(missileId++, 100, "Hellfire", 80.0, launchPadB, targetCity));
+    controller.addMissile(Missile(missileId++, 50, "Scud", 50.0, launchPadA));
+    controller.addMissile(Missile(missileId++, 50, "Scud", 50.0, launchPadA));
+    controller.addMissile(Missile(missileId++, 100, "Hellfire", 80.0, launchPadB));
+    controller.addMissile(Missile(missileId++, 100, "Hellfire", 80.0, launchPadB));
 
     // controller.moveAllMissiles(10.0, 20.0, 0.0);
     // std::cout << "\nMissile Status After Move:\n";
@@ -63,7 +63,11 @@ int main()
             std::cout << "\n";
             controller.printAllStatuses();
         }
-        else if (choice == 2)
+       else if (choice == 2)
+        {
+           std::cout << "need to implement";
+        }
+        else if (choice == 3)
         {
             running = false;
         }
