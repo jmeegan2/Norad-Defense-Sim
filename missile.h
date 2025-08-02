@@ -19,6 +19,13 @@ public:
     bool hasHitTarget() const;
     void printStatus() const;
 
+        // --- Add these public getter methods ---
+    int getId() const;
+    std::string getName() const;
+    double getSpeed() const;
+    Position getCurrentPosition() const;
+
+    void triggerLaunch(const Position& target);
 
 private:
     // Private member variables (now encapsulated)
@@ -27,6 +34,8 @@ private:
     std::string name;
     double speed;
     Position currentPosition;
+
+    bool isLaunched;
 };
 
 #endif

@@ -7,21 +7,22 @@
 int main()
 {
 
-    std::string password;
-    while (true)
-    {
-        std::cout << "Enter password: ";
-        std::cin >> password;
-        if (password == "NORAD123")
-        {
-            std::cout << "Access granted.\n";
-            break;
-        }
-        else
-        {
-            std::cout << "Access denied. Try again.\n";
-        }
-    }
+    // std::string password;
+    // while (true)
+    // {
+    //     std::cout << "Enter password: ";
+    //     std::cin >> password;
+    //     if (password == "NORAD123")
+    //     {
+    //         std::cout << "Access granted.\n";
+    //         break;
+    //     }
+    //     else
+    //     {
+    //         std::cout << "Access denied. Try again.\n";
+    //     }
+    // }
+
     int missileId = 1;
     std::cout << "\033[1;32m\nNORAD Missile System Engaged\033[0m\n";
 
@@ -32,21 +33,18 @@ int main()
     Missile::Position launchPadB = {200.0, 75.0, 0.0};
     Missile::Position targetCity = {500.0, 1000.0, 0.0};
 
-    controller.addMissile(Missile(missileId++, 50, "Scud", 50.0, launchPadA));
+    controller.addMissile(Missile(missileId++, 50, "Scud", 56.0, launchPadA));
     controller.addMissile(Missile(missileId++, 50, "Scud", 50.0, launchPadA));
     controller.addMissile(Missile(missileId++, 100, "Hellfire", 80.0, launchPadB));
     controller.addMissile(Missile(missileId++, 100, "Hellfire", 80.0, launchPadB));
-
-    // controller.moveAllMissiles(10.0, 20.0, 0.0);
-    // std::cout << "\nMissile Status After Move:\n";
-    // controller.printAllStatuses();
 
     bool running = true;
     while (running)
     {
         std::cout << "\nMenu:\n";
         std::cout << "1. List Missiles\n";
-        std::cout << "2. Exit\n";
+        std::cout << "2. Launch Missile\n";
+        std::cout << "3. Exit\n";
         std::cout << "Choose an option: ";
         int choice;
         std::cin >> choice;
@@ -63,9 +61,25 @@ int main()
             std::cout << "\n";
             controller.printAllStatuses();
         }
-       else if (choice == 2)
+        else if (choice == 2) // Handle the "Launch Missile" option
         {
-           std::cout << "need to implement";
+            int idToLaunch;
+            std::cout << "Enter the ID of the missile to launch: ";
+            std::cin >> idToLaunch;
+
+            // Use your new getMissileById function to find the missile
+            Missile *missileToLaunch = controller.getMissileById(idToLaunch);
+
+            if (missileToLaunch != nullptr)
+            {
+                std::cout << "\nMissile with ID " << idToLaunch << " selected." << std::endl;
+                // Pass the found missile instance (dereference the pointer)
+                controller.launchMissile(*missileToLaunch, targetCity);
+            }
+            else
+            {
+                std::cout << "\033[31mError: Missile with ID " << idToLaunch << " not found.\033[0m\n";
+            }
         }
         else if (choice == 3)
         {
