@@ -1,5 +1,12 @@
 #include "missile_controller.h"
 
+#define RESET "\033[0m"
+#define BOLD "\033[1m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define CYAN "\033[36m"
+#define RED "\033[31m"
+
 void MissileController::addMissile(const Missile &missile)
 {
     missiles.push_back(missile);
@@ -22,19 +29,40 @@ void MissileController::printAllStatuses() const
 }
 
 void MissileController::launchMissile(Missile &missile, const Missile::Position& targetCity) {
-    std::cout << "ID: " << missile.getId() << std::endl;    // Changed from missile.id
-    std::cout << "Speed: " << missile.getSpeed() << std::endl; // Changed from missile.speed
-    std::cout << "Target: (" << targetCity.x << ", " 
-              << targetCity.y << ", " << targetCity.z << ")" << std::endl;
-    std::cout << "----------------------" << std::endl;
+    // Store both the ID and the Name at the beginning,
+    // before the missile is removed from the vector.
+    std::cout << "\n";
+    int missileId = missile.getId();
+    std::string missileName = missile.getName();
 
+    // Action header in bright yellow
+    std::cout << "\033[1;33m-- Launching " << missileName << " Missile --\033[0m" << std::endl;
+              
+    // Details in bright blue/cyan
+    std::cout << "\033[36m  - Speed: " << missile.getSpeed() << " m/s" << std::endl;
+    std::cout << "  - From: (" << missile.getCurrentPosition().x << ", "
+              << missile.getCurrentPosition().y << ", " << missile.getCurrentPosition().z << ")" << std::endl;
+    std::cout << "  - To:   (" << targetCity.x << ", " 
+              << targetCity.y << ", " << targetCity.z << ")" << std::endl;
+    std::cout << "\033[0m------------------------------------------" << std::endl;
+
+    // This is where the blocking flight simulation happens
     missile.triggerLaunch(targetCity);
-    removeMissileById(missile.getId());
+    
+    // Now that the missile has completed its flight, remove it using the stored ID.
+    if (removeMissileById(missileId)) {
+        std::cout << "\n\033[1;32m" << missileName << " missle removed from inventory.\033[0m" << std::endl;
+    } else {
+        std::cout << "\n\033[1;31mError: Failed to remove " << missileName << " (ID: #" << missileId << ").\033[0m" << std::endl;
+    }
 }
 
-bool MissileController::removeMissileById(int id) {
-      for (auto it = missiles.begin(); it != missiles.end(); ++it) {
-        if (it->getId() == id) {
+bool MissileController::removeMissileById(int id)
+{
+    for (auto it = missiles.begin(); it != missiles.end(); ++it)
+    {
+        if (it->getId() == id)
+        {
             missiles.erase(it);
             return true; // Found and removed the missile
         }
@@ -43,9 +71,12 @@ bool MissileController::removeMissileById(int id) {
 }
 
 // Return specific instance of Missile
-Missile* MissileController::getMissileById(int id) {
-    for (Missile& missile : missiles) {
-        if (missile.getId() == id) { // Changed from missile.id
+Missile *MissileController::getMissileById(int id)
+{
+    for (Missile &missile : missiles)
+    {
+        if (missile.getId() == id)
+        { // Changed from missile.id
             return &missile;
         }
     }

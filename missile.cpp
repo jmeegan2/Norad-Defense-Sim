@@ -52,41 +52,52 @@ Missile::Position Missile::getCurrentPosition() const {
 
 void Missile::triggerLaunch(const Position& target) {
     if (isLaunched) {
-        std::cout << "Missile " << getId() << " is already launched!" << std::endl;
+        std::cout << "\033[31mMissile " << getName() << " (ID #" << getId() << ") is already launched!\033[0m" << std::endl;
         return;
     }
 
     isLaunched = true;
-    std::cout << "\nMissile " << getId() << " is launching towards target!" << std::endl;
+    std::cout << "\033[36m-- Launch sequence initiated for " << getName() << " --\033[0m" << std::endl;
     
-    // Define max altitude for the simulation
     double maxAltitude = 500.0;
-    
-    // Store the initial position for calculations
     Position initialPosition = currentPosition;
     
-    int steps = 20; // Increase steps for a smoother path
+    int steps = 20;
     
+    // Calculate total distance for a more meaningful progress bar
+    double dxTotal = target.x - initialPosition.x;
+    double dyTotal = target.y - initialPosition.y;
+    double dzTotal = target.z - initialPosition.z;
+    double totalDistance = std::sqrt(dxTotal*dxTotal + dyTotal*dyTotal + dzTotal*dzTotal);
+
     for (int i = 0; i <= steps; ++i) {
-        double t = static_cast<double>(i) / steps; // t goes from 0.0 to 1.0
+        double t = static_cast<double>(i) / steps;
         
-        // Calculate the intermediate position for x and y
-        currentPosition.x = initialPosition.x + t * (target.x - initialPosition.x);
-        currentPosition.y = initialPosition.y + t * (target.y - initialPosition.y);
-        
-        // Calculate the altitude (z) using a simple parabola-like curve
-        // It starts at initial Z, rises to a peak, and lands at target Z
+        currentPosition.x = initialPosition.x + t * dxTotal;
+        currentPosition.y = initialPosition.y + t * dyTotal;
         currentPosition.z = initialPosition.z + (t * (1.0 - t)) * maxAltitude * 4;
         
-        // Print the new position
-        std::cout << "Missile " << getId() << " position: (" << currentPosition.x << ", " 
-                  << currentPosition.y << ", " << currentPosition.z << ")" << std::endl;
+        // Use a progress indicator and colored output for the path
+        double currentDistance = std::sqrt(
+            std::pow(currentPosition.x - initialPosition.x, 2) +
+            std::pow(currentPosition.y - initialPosition.y, 2) +
+            std::pow(currentPosition.z - initialPosition.z, 2)
+        );
+
+        std::cout << "\r\033[33m[ \033[0m"
+                  << std::string(i, '#') << std::string(steps - i, ' ')
+                  << "\033[33m ] " << static_cast<int>(t * 100) << "% "
+                  << "pos: (" << static_cast<int>(currentPosition.x) << ", " 
+                  << static_cast<int>(currentPosition.y) << ", " << static_cast<int>(currentPosition.z) << ")\033[0m"
+                  << std::flush;
         
-        // Simulate flight time
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
     
-    // Ensure the final position is exactly the target city
+    // Ensure final output is on a new line
+    std::cout << std::endl; 
+    
+    // Final position message
     currentPosition = target;
-    std::cout << "\033[32mMissile " << getId() << " has reached its target!\033[0m" << std::endl;
+    std::cout << "\033[1;32m" << getName() << " (ID #" << getId() << ") has reached its target!\033[0m" << std::endl;
 }
