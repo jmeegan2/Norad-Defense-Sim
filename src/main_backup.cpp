@@ -2,10 +2,6 @@
 #include <vector>
 #include <string>
 #include <limits>
-#include <thread>
-#include <chrono>
-#include <iomanip>
-#include <cstdlib>
 #include "missile_controller.h"
 #include "enemy_missile.h"
 #include "detection_system.h"
@@ -18,8 +14,6 @@
 #define YELLOW "\033[33m"
 #define CYAN "\033[36m"
 #define RED "\033[31m"
-#define BLUE "\033[34m"
-#define MAGENTA "\033[35m"
 
 // Configuration structure for missile initialization
 struct MissileConfig {
@@ -34,26 +28,15 @@ enum MenuOption {
     LIST = 1,
     LAUNCH = 2,
     DETECT = 3,
-    LIVE_VIEW = 4,
-    EXIT = 5
+    EXIT = 4
 };
-
-// Clear screen function
-void clearScreen() {
-    #ifdef _WIN32
-        system("cls");
-    #else
-        system("clear");
-    #endif
-}
-
-// Move cursor to top-left
-void resetCursor() {
-    std::cout << "\033[H";
-}
 
 /**
  * Gets validated integer input from user within specified range
+ * @param prompt Message to display to user
+ * @param min Minimum acceptable value
+ * @param max Maximum acceptable value
+ * @return Valid integer within range
  */
 int getChoice(const std::string& prompt, int min, int max) {
     int choice;
@@ -75,6 +58,9 @@ int getChoice(const std::string& prompt, int min, int max) {
 
 /**
  * Removes an enemy missile from the vector by ID
+ * @param enemies Vector of enemy missiles
+ * @param id ID of missile to remove
+ * @return true if missile was found and removed, false otherwise
  */
 bool removeEnemyMissileById(std::vector<EnemyMissile>& enemies, int id) {
     for (auto it = enemies.begin(); it != enemies.end(); ++it) {
@@ -87,111 +73,9 @@ bool removeEnemyMissileById(std::vector<EnemyMissile>& enemies, int id) {
 }
 
 /**
- * Display live battlefield view
- */
-void displayLiveBattlefield(const MissileController& controller, 
-                           const std::vector<EnemyMissile>& enemyMissiles,
-                           const std::vector<Target>& targets,
-                           const std::vector<ThreatReport>& threats) {
-    clearScreen();
-    
-    // Header
-    std::cout << BOLD << CYAN << "═══════════════════════════════════════════════════════════════" << RESET << std::endl;
-    std::cout << BOLD << CYAN << "                    MISSILE DEFENSE COMMAND CENTER             " << RESET << std::endl;
-    std::cout << BOLD << CYAN << "═══════════════════════════════════════════════════════════════" << RESET << std::endl;
-    
-    // System status
-    auto now = std::chrono::system_clock::now();
-    auto time_t = std::chrono::system_clock::to_time_t(now);
-    std::cout << YELLOW << "Time: " << std::put_time(std::localtime(&time_t), "%H:%M:%S") 
-              << "    Status: " << GREEN << "OPERATIONAL" << RESET << std::endl;
-    std::cout << std::endl;
-    
-    // Threats section
-    if (!threats.empty()) {
-        std::cout << BOLD << RED << "🚨 ACTIVE THREATS: " << threats.size() << RESET << std::endl;
-        for (const auto& threat : threats) {
-            std::cout << RED << "  ▶ Threat #" << threat.detectionId 
-                      << " → " << threat.targetName
-                      << " (Distance: " << static_cast<int>(threat.distanceToTarget) << "km)"
-                      << RESET << std::endl;
-        }
-    } else {
-        std::cout << GREEN << "✅ NO THREATS DETECTED" << RESET << std::endl;
-    }
-    std::cout << std::endl;
-    
-    // Enemy missiles
-    std::cout << BOLD << MAGENTA << "🎯 ENEMY MISSILES:" << RESET << std::endl;
-    if (enemyMissiles.empty()) {
-        std::cout << GREEN << "  None detected" << RESET << std::endl;
-    } else {
-        for (const auto& enemy : enemyMissiles) {
-            Position pos = enemy.getCurrentPosition();
-            Position target = enemy.getTargetPosition();
-            std::cout << RED << "  ▶ ID:" << enemy.getId() 
-                      << " Pos:(" << static_cast<int>(pos.x) << "," << static_cast<int>(pos.y) << ")"
-                      << " → (" << static_cast<int>(target.x) << "," << static_cast<int>(target.y) << ")"
-                      << " Speed:" << static_cast<int>(enemy.getSpeed()) << "m/s"
-                      << RESET << std::endl;
-        }
-    }
-    std::cout << std::endl;
-    
-    // Our missiles
-    std::cout << BOLD << BLUE << "🚀 OUR MISSILES:" << RESET << std::endl;
-    controller.printAllStatuses();
-    std::cout << std::endl;
-    
-    // Targets
-    std::cout << BOLD << YELLOW << "🏙️  PROTECTED TARGETS:" << RESET << std::endl;
-    for (const auto& target : targets) {
-        std::cout << YELLOW << "  ▶ " << target.name 
-                  << " (" << target.position.x << "," << target.position.y << ")"
-                  << RESET << std::endl;
-    }
-    std::cout << std::endl;
-    
-    std::cout << CYAN << "Press Ctrl+C to return to menu..." << RESET << std::endl;
-}
-
-/**
- * Real-time live view mode
- */
-void runLiveView(MissileController& controller, 
-                std::vector<EnemyMissile>& enemyMissiles,
-                const std::vector<Target>& targets,
-                DetectionSystem& radar) {
-    
-    clearScreen();
-    std::cout << BOLD << GREEN << "Entering Live View Mode..." << RESET << std::endl;
-    std::cout << "Press Ctrl+C to exit" << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    
-    try {
-        while (true) {
-            // Update enemy missile positions
-            for (auto& enemy : enemyMissiles) {
-                enemy.move();
-            }
-            
-            // Scan for threats
-            std::vector<ThreatReport> threats = radar.scanForThreats();
-            
-            // Display the battlefield
-            displayLiveBattlefield(controller, enemyMissiles, targets, threats);
-            
-            // Update every second
-            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-        }
-    } catch (...) {
-        clearScreen();
-        std::cout << YELLOW << "Exiting live view..." << RESET << std::endl;
-    }
-}
-
-/**
  * Handles the missile launch process including target selection
+ * @param controller Reference to missile controller
+ * @param targets Vector of available targets
  */
 void handleLaunchMissile(MissileController& controller, const std::vector<Target>& targets) {
     controller.printAllStatuses();
@@ -215,6 +99,9 @@ void handleLaunchMissile(MissileController& controller, const std::vector<Target
 
 /**
  * Handles threat detection and interception process
+ * @param controller Reference to missile controller
+ * @param enemyMissiles Vector of enemy missiles (modified by reference)
+ * @param radar Reference to detection system
  */
 void handleThreatDetection(MissileController& controller, 
                           std::vector<EnemyMissile>& enemyMissiles, 
@@ -269,12 +156,14 @@ void displayMenu() {
     std::cout << "1. List Missiles\n";
     std::cout << "2. Launch Missile\n";
     std::cout << "3. Detect Incoming Threats\n";
-    std::cout << "4. 🔴 Live Battlefield View\n";
-    std::cout << "5. Exit\n";
+    std::cout << "4. Exit\n";
 }
 
 /**
  * Initializes system data including missiles, targets, and enemy missiles
+ * @param controller Reference to missile controller to populate
+ * @param enemyMissiles Reference to enemy missile vector to populate
+ * @param targets Reference to targets vector
  */
 void initializeSystem(MissileController& controller, 
                      std::vector<EnemyMissile>& enemyMissiles,
@@ -305,10 +194,9 @@ void initializeSystem(MissileController& controller,
         ));
     }
 
-    // Initialize enemy missiles with more interesting movement
-    enemyMissiles.push_back(EnemyMissile(101, {5000.0, 3000.0, 0.0}, targets[0].position, 50.0));
-    enemyMissiles.push_back(EnemyMissile(102, {6000.0, 4000.0, 0.0}, targets[1].position, 75.0));
-    enemyMissiles.push_back(EnemyMissile(103, {4500.0, 2500.0, 0.0}, targets[2].position, 60.0));
+    // Initialize enemy missiles
+    enemyMissiles.push_back(EnemyMissile(101, {5000.0, 3000.0, 0.0}, targets[0].position, 150.0));
+    enemyMissiles.push_back(EnemyMissile(102, {6000.0, 4000.0, 0.0}, targets[1].position, 180.0));
 }
 
 int main() {
@@ -318,26 +206,20 @@ int main() {
     MissileController controller;
     std::vector<EnemyMissile> enemyMissiles;
     
-const std::vector<Target> usTargets = {
-    {"New York", {-74.0, 40.7, 0.0}},
-    {"Washington DC", {-77.0, 38.9, 0.0}},
-    {"Los Angeles", {-118.2, 34.0, 0.0}}
-};
-
-const std::vector<Target> retaliationTargets = {
-    {"Pyongyang", {127.5, 39.0, 0.0}},
-    {"Moscow", {37.6, 55.7, 0.0}},
-    {"Beijing", {116.4, 39.9, 0.0}}
-};
+    const std::vector<Target> targets = {
+        {"Pyongyang", {127.5, 39.0, 0.0}},
+        {"Moscow", {37.6, 55.7, 0.0}},
+        {"Beijing", {116.4, 39.9, 0.0}}
+    };
     
-    initializeSystem(controller, enemyMissiles, usTargets);
-    DetectionSystem radar(enemyMissiles, usTargets);
+    initializeSystem(controller, enemyMissiles, targets);
+    DetectionSystem radar(enemyMissiles, targets);
 
     // Main application loop
     bool running = true;
     while (running) {
         displayMenu();
-        MenuOption choice = static_cast<MenuOption>(getChoice("\nChoose an option: ", 1, 5));
+        MenuOption choice = static_cast<MenuOption>(getChoice("\nChoose an option: ", 1, 4));
 
         switch (choice) {
             case LIST:
@@ -345,15 +227,11 @@ const std::vector<Target> retaliationTargets = {
                 break;
                 
             case LAUNCH:
-                handleLaunchMissile(controller, retaliationTargets);
+                handleLaunchMissile(controller, targets);
                 break;
                 
             case DETECT:
                 handleThreatDetection(controller, enemyMissiles, radar);
-                break;
-                
-            case LIVE_VIEW:
-                runLiveView(controller, enemyMissiles, usTargets, radar);
                 break;
                 
             case EXIT:
