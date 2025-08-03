@@ -2,6 +2,7 @@
 #include <cmath>
 #include "target.h"
 #include "enemy_missile.h"
+#include <iostream>
 
 DetectionSystem::DetectionSystem(const std::vector<EnemyMissile>& enemyMissiles, const std::vector<Target>& targets)
     : enemyMissiles(enemyMissiles), targets(targets), detectionIdCounter(0) {}
@@ -14,7 +15,9 @@ std::vector<ThreatReport> DetectionSystem::scanForThreats() {
 
         // Get the enemy missile's intended target position
         Position enemyTargetPos = enemy.getTargetPosition();
-        
+      std::cout << "Enemy target pos: {" << enemyTargetPos.x
+                 << ", " << enemyTargetPos.y
+                 << ", " << enemyTargetPos.z << "}" << std::endl;        
         // Find the actual Target object that matches this position
         // This is a simplified way to find the target's name
         std::string targetName = "Unknown";
