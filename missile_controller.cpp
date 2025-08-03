@@ -29,7 +29,8 @@ void MissileController::printAllStatuses() const
     }
 }
 
-void MissileController::launchMissile(Missile &missile, const Missile::Position& targetCity) {
+void MissileController::launchMissile(Missile &missile, const Missile::Position &targetCity)
+{
     // Store both the ID and the Name at the beginning,
     // before the missile is removed from the vector.
     std::cout << "\n";
@@ -38,23 +39,26 @@ void MissileController::launchMissile(Missile &missile, const Missile::Position&
 
     // Action header in bright yellow
     std::cout << "\033[1;33m-- Launching " << missileName << " Missile --\033[0m" << std::endl;
-              
+
     // Details in bright blue/cyan
     std::cout << "\033[36m  - Speed: " << missile.getSpeed() << " m/s" << std::endl;
     std::cout << "  - From: (" << missile.getCurrentPosition().x << ", "
               << missile.getCurrentPosition().y << ", " << missile.getCurrentPosition().z << ")" << std::endl;
-    std::cout << "  - To:   (" << targetCity.x << ", " 
+    std::cout << "  - To:   (" << targetCity.x << ", "
               << targetCity.y << ", " << targetCity.z << ")" << std::endl;
     std::cout << "\033[0m------------------------------------------" << std::endl;
 
     // This is where the blocking flight simulation happens
     missile.triggerLaunch(targetCity);
-    
+
     // Now that the missile has completed its flight, remove it using the stored ID.
-    if (removeMissileById(missileId)) {
-        
+    if (removeMissileById(missileId))
+    {
+
         // std::cout << "\n\033[1;32m" << missileName << " missle removed from inventory.\033[0m" << std::endl;
-    } else {
+    }
+    else
+    {
         std::cout << "\n\033[1;31mError: Failed to remove " << missileName << " (ID: #" << missileId << ").\033[0m" << std::endl;
     }
 }
