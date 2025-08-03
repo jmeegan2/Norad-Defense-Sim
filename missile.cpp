@@ -2,7 +2,7 @@
 #include <thread> // Required for std::this_thread::sleep_for
 #include <chrono> // Required for std::chrono::milliseconds
 #include <cmath>  // Required for std::sqrt
-
+#include "position.h"
 // This is the full definition of the constructor
 Missile::Missile(int id, int damage, std::string missileName, double missileSpeed, Position startPosition)
     : id(id),
@@ -47,7 +47,7 @@ double Missile::getSpeed() const
     return speed;
 }
 
-Missile::Position Missile::getCurrentPosition() const
+Position Missile::getCurrentPosition() const
 {
     return currentPosition;
 }

@@ -3,16 +3,12 @@
 
 #include <string>
 #include <iostream>
+#include "position.h"
+
 
 class Missile
 {
 public:
-    struct Position
-    {
-        double x;
-        double y;
-        double z;
-    };
 
     // Corrected constructor declaration
     Missile(int id, int damage, std::string missileName, double missileSpeed, Position startPosition);

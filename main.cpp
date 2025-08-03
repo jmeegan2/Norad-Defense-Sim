@@ -10,13 +10,13 @@ struct MissileConfig
     int damage;
     std::string name;
     double speed;
-    Missile::Position position;
+    Position position;
 };
 
 struct Target
 {
     std::string name;
-    Missile::Position position;
+    Position position;
 };
 
 // Helper function to get validated integer input
@@ -61,7 +61,7 @@ void handleLaunchMissile(MissileController &controller, const std::vector<Target
 
         int targetChoice = getChoice("\nChoose a target (by number): ", 1, targets.size());
 
-        const Missile::Position &chosenTarget = targets[targetChoice - 1].position;
+        const Position &chosenTarget = targets[targetChoice - 1].position;
         controller.launchMissile(*missileToLaunch, chosenTarget);
     }
     else
@@ -77,7 +77,7 @@ enum MenuOption
 {
     LIST = 1,
     LAUNCH = 2,
-    SIMULATE_ATTACK = 3,
+    DETECT = 3,
     EXIT = 4
 };
 
@@ -87,8 +87,8 @@ int main()
     int missileId = 1;
     std::cout << "\033[1;32m\nNORAD Missile System Engaged\033[0m\n";
     MissileController controller;
-    const Missile::Position launchPadA = {100.0, 50.0, 0.0};
-    const Missile::Position launchPadB = {200.0, 75.0, 0.0};
+    const Position launchPadA = {100.0, 50.0, 0.0};
+    const Position launchPadB = {200.0, 75.0, 0.0};
     const std::vector<Target> targets = {
         {"Pyongyang", {127.5, 39.0, 0.0}},
         {"Moscow", {37.6, 55.7, 0.0}},
@@ -128,6 +128,8 @@ int main()
         case LAUNCH:
             handleLaunchMissile(controller, targets);
             break;
+        case DETECT: 
+            controller.detectIncomingMissiles();
         case EXIT:
             running = false;
             break;

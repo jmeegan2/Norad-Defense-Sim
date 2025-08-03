@@ -20,6 +20,11 @@ void MissileController::moveAllMissiles(double dx, double dy, double dz)
     }
 }
 
+void MissileController::detectIncomingMissiles()
+{
+
+}
+
 void MissileController::printAllStatuses() const
 {
     std::cout << "\n";
@@ -29,7 +34,7 @@ void MissileController::printAllStatuses() const
     }
 }
 
-void MissileController::launchMissile(Missile &missile, const Missile::Position &targetCity)
+void MissileController::launchMissile(Missile &missile, const Position &targetCity)
 {
     // Store both the ID and the Name at the beginning,
     // before the missile is removed from the vector.
