@@ -1,141 +1,127 @@
-#include <string>
 #include <iostream>
-#include "missile.h"
 #include <vector>
+#include <string>
+#include <limits>
 #include "missile_controller.h"
+
+// Your existing structs
+struct MissileConfig {
+    int damage;
+    std::string name;
+    double speed;
+    Missile::Position position;
+};
+
+struct Target {
+    std::string name;
+    Missile::Position position;
+};
+
+// Helper function to get validated integer input
+int getChoice(const std::string& prompt, int min, int max) {
+    int choice;
+    while (true) {
+        std::cout << prompt;
+        std::cin >> choice;
+        if (std::cin.fail() || choice < min || choice > max) {
+            std::cout << "\033[31mInvalid option. Please enter a number between " 
+                      << min << " and " << max << ".\033[0m\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        } else {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Clear the rest of the line
+            return choice;
+        }
+    }
+}
+
+// Function to handle the complex launch missile process
+void handleLaunchMissile(MissileController& controller, const std::vector<Target>& targets) {
+    controller.printAllStatuses();
+
+    int missileIdToLaunch = getChoice("\nEnter the ID of the missile to launch: ", 1, 999);
+
+    Missile* missileToLaunch = controller.getMissileById(missileIdToLaunch);
+
+    if (missileToLaunch) {
+        std::cout << "\nAvailable Targets:\n";
+        for (size_t i = 0; i < targets.size(); ++i) {
+            std::cout << i + 1 << ". " << targets[i].name << "\n";
+        }
+
+        int targetChoice = getChoice("\nChoose a target (by number): ", 1, targets.size());
+
+        const Missile::Position& chosenTarget = targets[targetChoice - 1].position;
+        controller.launchMissile(*missileToLaunch, chosenTarget);
+    } else {
+        std::cout << "\033[31mMissile with ID " << missileIdToLaunch << " not found.\033[0m\n";
+    }
+}
+
+// Use an enum for clearer menu options
+enum MenuOption {
+    LIST = 1,
+    LAUNCH = 2,
+    EXIT = 3
+};
 
 int main()
 {
-
-    // Helper struct for missile configuration
-    struct MissileConfig
-    {
-        int damage;
-        std::string name;
-        double speed;
-        Missile::Position position;
-    };
-
-    // New struct to hold a target's name and position
-    struct Target
-    {
-        std::string name;
-        Missile::Position position;
-    };
-
+    // ... (rest of your initial setup code) ...
     int missileId = 1;
     std::cout << "\033[1;32m\nNORAD Missile System Engaged\033[0m\n";
-
     MissileController controller;
-
-    // Missile locations
-    Missile::Position launchPadA = {100.0, 50.0, 0.0};
-    Missile::Position launchPadB = {200.0, 75.0, 0.0};
-
+    const Missile::Position launchPadA = {100.0, 50.0, 0.0};
+    const Missile::Position launchPadB = {200.0, 75.0, 0.0};
     const std::vector<Target> targets = {
         {"Pyongyang", {127.5, 39.0, 0.0}},
         {"Moscow", {37.6, 55.7, 0.0}},
-        {"Beijing", {116.4, 39.9, 0.0}}};
-
-    // Store your missile configurations in a vector with real names
+        {"Beijing", {116.4, 39.9, 0.0}}
+    };
     const std::vector<MissileConfig> configs = {
         {100, "Patriot", 80.0, launchPadA},
         {100, "Patriot", 80.0, launchPadA},
         {200, "Tomahawk", 100.0, launchPadB},
-        {50, "Stinger", 120.0, launchPadB}, // A very fast, but lower-damage missile
-        {150, "Javelin", 90.0, launchPadA}  // A new missile for variety!
+        {50, "Stinger", 120.0, launchPadB},
+        {150, "Javelin", 90.0, launchPadA}
     };
-
-    for (const auto &config : configs)
-    {
+    for (const auto& config : configs) {
         controller.addMissile(Missile(
             missileId++,
             config.damage,
             config.name,
             config.speed,
-            config.position));
+            config.position
+        ));
     }
-
+    
+    // The main application loop is now much cleaner
     bool running = true;
-    while (running)
-    {
+    while (running) {
         std::cout << "\nMenu:\n";
         std::cout << "1. List Missiles\n";
         std::cout << "2. Launch Missile\n";
         std::cout << "3. Exit\n";
-        std::cout << "Choose an option: ";
-        int choice;
-        std::cin >> choice;
 
-        if (std::cin.fail())
-        {
-            std::cin.clear();                                                   // clear error start
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // discard invalid input
-            std::cout << "\033[31mInvalid option.\033[0m\n";
-            continue;
-        }
-        if (choice == 1)
-        {
-            std::cout << "\n";
-            controller.printAllStatuses();
-        }
-        else if (choice == 2) // Handle the "Launch Missile" option
-        {
-            controller.printAllStatuses(); // First, show available missiles
+        MenuOption choice = static_cast<MenuOption>(getChoice("\nChoose an option: ", 1, 3));
 
-            int missileIdToLaunch;
-            std::cout << "\nEnter the ID of the missile to launch: ";
-            while (!(std::cin >> missileIdToLaunch))
-            {
-                std::cout << "\033[31mInvalid input. Please enter a number.\033[0m\n";
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "Enter the ID: ";
-            }
-
-            Missile *missileToLaunch = controller.getMissileById(missileIdToLaunch);
-
-            if (missileToLaunch)
-            {
-                // Now, prompt for the target
-                std::cout << "\nAvailable Targets:\n";
-                for (size_t i = 0; i < targets.size(); ++i)
-                {
-                    std::cout << i + 1 << ". " << targets[i].name << "\n";
-                }
-
-                int targetChoice;
-                std::cout << "Choose a target (by number): ";
-                while (!(std::cin >> targetChoice) || targetChoice < 1 || targetChoice > targets.size())
-                {
-                    std::cout << "\033[31mInvalid target choice. Please enter a number between 1 and "
-                              << targets.size() << ".\033[0m\n";
-                    std::cin.clear();
-                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                    std::cout << "Choose a target: ";
-                }
-
-                // Get the chosen target's position from the vector
-                const Missile::Position &chosenTarget = targets[targetChoice - 1].position;
-
-                // Now, you can pass both to the controller
-                controller.launchMissile(*missileToLaunch, chosenTarget);
-            }
-            else
-            {
-                std::cout << "\033[31mMissile with ID " << missileIdToLaunch << " not found.\033[0m\n";
-            }
-        }
-        else if (choice == 3)
-        {
-            running = false;
-        }
-        else
-        {
-            std::cout << "\033[31mInvalid option.\033[0m\n";
+        switch (choice) {
+            case LIST:
+                controller.printAllStatuses();
+                break;
+            case LAUNCH:
+                handleLaunchMissile(controller, targets);
+                break;
+            case EXIT:
+                running = false;
+                break;
+            default:
+                // This case should be unreachable due to getChoice validation, but is good practice
+                std::cout << "\033[31mInvalid option.\033[0m\n";
+                break;
         }
     }
-
+    
     std::cout << "\n";
-    return 0; // signal its status to the operating system after it has finished
+    return 0;
 }

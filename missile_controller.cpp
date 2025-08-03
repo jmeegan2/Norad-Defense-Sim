@@ -22,6 +22,7 @@ void MissileController::moveAllMissiles(double dx, double dy, double dz)
 
 void MissileController::printAllStatuses() const
 {
+    std::cout << "\n";
     for (const auto &missile : missiles)
     {
         missile.printStatus();
@@ -51,7 +52,8 @@ void MissileController::launchMissile(Missile &missile, const Missile::Position&
     
     // Now that the missile has completed its flight, remove it using the stored ID.
     if (removeMissileById(missileId)) {
-        std::cout << "\n\033[1;32m" << missileName << " missle removed from inventory.\033[0m" << std::endl;
+        
+        // std::cout << "\n\033[1;32m" << missileName << " missle removed from inventory.\033[0m" << std::endl;
     } else {
         std::cout << "\n\033[1;31mError: Failed to remove " << missileName << " (ID: #" << missileId << ").\033[0m" << std::endl;
     }
