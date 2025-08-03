@@ -2,7 +2,7 @@
 
 # Define the names of your C++ source files
 # The key is to include both .cpp files here
-SOURCE_FILES="main.cpp missile.cpp missile_controller.cpp"
+SOURCE_FILES="main.cpp missile.cpp missile_controller.cpp enemy_missile.cpp detection_system.cpp"
 
 # Define the name of the executable you want to create
 EXECUTABLE="main"

@@ -3,7 +3,9 @@
 #include <string>
 #include <limits>
 #include "missile_controller.h"
-
+#include "enemy_missile.h"    // <<< New include
+#include "detection_system.h" // <<< New include
+#include "target.h"           // <<< Make sure to include this new header now
 // Your existing structs
 struct MissileConfig
 {
@@ -13,11 +15,11 @@ struct MissileConfig
     Position position;
 };
 
-struct Target
-{
-    std::string name;
-    Position position;
-};
+// struct Target
+// {
+//     std::string name;
+//     Position position;
+// };
 
 // Helper function to get validated integer input
 int getChoice(const std::string &prompt, int min, int max)
@@ -70,8 +72,6 @@ void handleLaunchMissile(MissileController &controller, const std::vector<Target
     }
 }
 
-
-
 // Use an enum for clearer menu options
 enum MenuOption
 {
@@ -99,6 +99,11 @@ int main()
         {200, "Tomahawk", 100.0, launchPadB},
         {50, "Stinger", 120.0, launchPadB},
         {150, "Javelin", 90.0, launchPadA}};
+
+    // --- NEW: Create a vector of enemy missiles ---
+    std::vector<EnemyMissile> enemyMissiles;
+    enemyMissiles.push_back(EnemyMissile(101, {5000.0, 3000.0, 0.0}, targets[0].position, 150.0));
+    enemyMissiles.push_back(EnemyMissile(102, {6000.0, 4000.0, 0.0}, targets[1].position, 180.0));
     for (const auto &config : configs)
     {
         controller.addMissile(Missile(
@@ -109,6 +114,9 @@ int main()
             config.position));
     }
 
+    // --- NEW: Create an instance of your detection system ---
+    DetectionSystem radar(enemyMissiles, targets);
+
     // The main application loop is now much cleaner
     bool running = true;
     while (running)
@@ -116,9 +124,10 @@ int main()
         std::cout << "\nMenu:\n";
         std::cout << "1. List Missiles\n";
         std::cout << "2. Launch Missile\n";
-        std::cout << "3. Exit\n";
+        std::cout << "3. Detect Incoming Threats\n"; // <<< Updated menu text
+        std::cout << "4. Exit\n"; // <<< Exit is now option 4
 
-        MenuOption choice = static_cast<MenuOption>(getChoice("\nChoose an option: ", 1, 3));
+        MenuOption choice = static_cast<MenuOption>(getChoice("\nChoose an option: ", 1, 4));
 
         switch (choice)
         {
@@ -128,18 +137,37 @@ int main()
         case LAUNCH:
             handleLaunchMissile(controller, targets);
             break;
-        case DETECT: 
-            controller.detectIncomingMissiles();
+        case DETECT:
+        { // <<< Add this curly brace
+            std::cout << "\033[1;36mScanning for threats...\033[0m" << std::endl;
+
+            std::vector<ThreatReport> threats = radar.scanForThreats();
+
+            if (threats.empty())
+            {
+                std::cout << "\033[32mNo threats detected.\033[0m" << std::endl;
+            }
+            else
+            {
+                std::cout << "\033[1;31mThreats Detected!\033[0m" << std::endl;
+                for (const auto &threat : threats)
+                {
+                    std::cout << "  - ID: " << threat.detectionId
+                              << ", To: " << threat.targetName
+                              << ", Distance: " << static_cast<int>(threat.distanceToTarget)
+                              << ", Speed: " << static_cast<int>(threat.calculatedSpeed) << " m/s" << std::endl;
+                }
+            }
+            break;
+        } // <
         case EXIT:
             running = false;
             break;
         default:
-            // This case should be unreachable due to getChoice validation, but is good practice
             std::cout << "\033[31mInvalid option.\033[0m\n";
             break;
         }
     }
-
     std::cout << "\n";
     return 0;
 }
