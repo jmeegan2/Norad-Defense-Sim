@@ -1,10 +1,23 @@
-Basic MVP 
+# Missile Defense System
 
-- Simulate missle attack on ground based location 
-- Intercept missles based on probability of interception and distance
-- Detection system 
-- Tracking system 
+A real-time C++ simulation of a missile defense system with threat detection and interception capabilities.
 
-Tools and languages used: 
-- C++
-- Qt + Qt creator for display 
+## Features
+- Real-time missile tracking
+- 3D position calculations  
+- Interactive command-line interface
+- Threat detection and interception
+
+## Building
+```bash
+mkdir build && cd build
+cmake ..
+make
+./MissileDefenseSystem
+```
+
+## Structure
+- `src/` - Source files (.cpp)
+- `include/` - Header files (.h)
+- `tests/` - Unit tests
+- `build/` - Build artifacts

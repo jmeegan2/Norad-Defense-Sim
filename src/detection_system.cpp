@@ -15,9 +15,9 @@ std::vector<ThreatReport> DetectionSystem::scanForThreats() {
 
         // Get the enemy missile's intended target position
         Position enemyTargetPos = enemy.getTargetPosition();
-      std::cout << "Enemy target pos: {" << enemyTargetPos.x
-                 << ", " << enemyTargetPos.y
-                 << ", " << enemyTargetPos.z << "}" << std::endl;        
+    //   std::cout << "Enemy target pos: {" << enemyTargetPos.x
+    //              << ", " << enemyTargetPos.y
+    //              << ", " << enemyTargetPos.z << "}" << std::endl;        
         // Find the actual Target object that matches this position
         // This is a simplified way to find the target's name
         std::string targetName = "Unknown";
