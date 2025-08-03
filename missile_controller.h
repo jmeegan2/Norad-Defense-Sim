@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "missile.h"
+#include "detection_system.h"
 
 class MissileController
 {
@@ -14,6 +15,7 @@ public:
     Missile *getMissileById(int id);
     bool removeMissileById(int id);
     void detectIncomingMissiles();
+    int interceptThreat(const ThreatReport& threat);
 
 private:
     std::vector<Missile> missiles;

@@ -20,11 +20,28 @@ void MissileController::moveAllMissiles(double dx, double dy, double dz)
     }
 }
 
-void MissileController::detectIncomingMissiles()
-{
+int MissileController::interceptThreat(const ThreatReport& threat) {
+    // Early return for edge case
+    if (missiles.empty()) {
+        std::cout << RED << "No available missiles to launch an intercept!" << RESET << std::endl;
+        return -1;
+    }
 
+    // Select interceptor missile
+    Missile& interceptorMissile = missiles.front();
+    
+    // Cache missile details before potential removal
+    int missileId = interceptorMissile.getId();
+    std::string missileName = interceptorMissile.getName();
+    
+    // Simple intercept notification
+    std::cout << GREEN << "Intercept started" << RESET << std::endl;
+
+    // Execute intercept mission
+    launchMissile(interceptorMissile, threat.enemyPosition);
+
+    return threat.enemyId;
 }
-
 void MissileController::printAllStatuses() const
 {
     std::cout << "\n";

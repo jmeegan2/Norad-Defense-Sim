@@ -45,6 +45,7 @@ std::vector<ThreatReport> DetectionSystem::scanForThreats() {
             threat.targetName = targetName;
             threat.distanceToTarget = distance;
             threat.calculatedSpeed = enemy.getSpeed();
+            threat.enemyPosition = enemy.getCurrentPosition();
 
             currentThreats.push_back(threat);
         }
