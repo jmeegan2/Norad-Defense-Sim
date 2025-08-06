@@ -1,17 +1,17 @@
-#ifndef MISSILE_H
-#define MISSILE_H
+#ifndef FRIENDLY_MISSILE_H
+#define FRIENDLY_MISSILE_H
 
 #include <string>
 #include <iostream>
 #include "position.h"
 
 
-class Missile
+class InterceptorMissile
 {
 public:
 
     // Corrected constructor declaration
-    Missile(int id, int damage, std::string missileName, double missileSpeed, Position startPosition);
+    InterceptorMissile(int id, int damage, std::string missileName, double missileSpeed, Position startPosition);
     void move(double dx, double dy, double dz);
     bool hasHitTarget() const;
     void printStatus() const;

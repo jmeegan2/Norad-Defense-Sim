@@ -1,10 +1,10 @@
-#include "missile.h"
+#include "interceptor_missile.h"
 #include <thread> // Required for std::this_thread::sleep_for
 #include <chrono> // Required for std::chrono::milliseconds
 #include <cmath>  // Required for std::sqrt
 #include "position.h"
 // This is the full definition of the constructor
-Missile::Missile(int id, int damage, std::string missileName, double missileSpeed, Position startPosition)
+InterceptorMissile::InterceptorMissile(int id, int damage, std::string missileName, double missileSpeed, Position startPosition)
     : id(id),
       damageStrength(damage),
       name(missileName),
@@ -16,14 +16,14 @@ Missile::Missile(int id, int damage, std::string missileName, double missileSpee
     // All initialization is done in the initializer list
 }
 
-void Missile::move(double dx, double dy, double dz)
+void InterceptorMissile::move(double dx, double dy, double dz)
 {
     currentPosition.x += dx;
     currentPosition.y += dy;
     currentPosition.z += dz;
 }
 
-void Missile::printStatus() const
+void InterceptorMissile::printStatus() const
 {
     std::cout << "Missile #" << id << " (" << name << ") at ("
               << currentPosition.x << ", "
@@ -32,27 +32,27 @@ void Missile::printStatus() const
 }
 
 // --- Implement the new getter methods ---
-int Missile::getId() const
+int InterceptorMissile::getId() const
 {
     return id;
 }
 
-std::string Missile::getName() const
+std::string InterceptorMissile::getName() const
 {
     return name;
 }
 
-double Missile::getSpeed() const
+double InterceptorMissile::getSpeed() const
 {
     return speed;
 }
 
-Position Missile::getCurrentPosition() const
+Position InterceptorMissile::getCurrentPosition() const
 {
     return currentPosition;
 }
 
-void Missile::triggerLaunch(const Position &target)
+void InterceptorMissile::triggerLaunch(const Position &target)
 {
     if (isLaunched)
     {

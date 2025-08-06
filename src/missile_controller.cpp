@@ -11,7 +11,7 @@
 #define MAGENTA "\033[35m"
 
 // Existing methods (keeping your current implementations)
-void MissileController::addMissile(const Missile &missile)
+void MissileController::addMissile(const InterceptorMissile &missile)
 {
     missiles.push_back(missile);
 }
@@ -33,7 +33,7 @@ void MissileController::printAllStatuses() const
     }
 }
 
-void MissileController::launchMissile(Missile &missile, const Position &targetCity)
+void MissileController::launchMissile(InterceptorMissile &missile, const Position &targetCity)
 {
     std::cout << "\n";
     int missileId = missile.getId();
@@ -49,7 +49,7 @@ void MissileController::launchMissile(Missile &missile, const Position &targetCi
 
     missile.triggerLaunch(targetCity);
 
-    if (removeMissileById(missileId))
+    if (removeDefensiveMissile(missileId))
     {
         // Missile removed successfully
     }
@@ -59,7 +59,7 @@ void MissileController::launchMissile(Missile &missile, const Position &targetCi
     }
 }
 
-bool MissileController::removeMissileById(int id)
+bool MissileController::removeDefensiveMissile(int id)
 {
     for (auto it = missiles.begin(); it != missiles.end(); ++it)
     {
@@ -72,9 +72,9 @@ bool MissileController::removeMissileById(int id)
     return false;
 }
 
-Missile *MissileController::getMissileById(int id)
+InterceptorMissile *MissileController::getMissileById(int id)
 {
-    for (Missile &missile : missiles)
+    for (InterceptorMissile &missile : missiles)
     {
         if (missile.getId() == id)
         {
@@ -90,7 +90,7 @@ int MissileController::interceptThreat(const ThreatReport& threat) {
         return -1;
     }
 
-    Missile& interceptorMissile = missiles.front();
+    InterceptorMissile& interceptorMissile = missiles.front();
     int missileId = interceptorMissile.getId();
     std::string missileName = interceptorMissile.getName();
     
@@ -152,7 +152,7 @@ std::vector<int> MissileController::autoInterceptThreats(const std::vector<Threa
         }
 
         if (shouldInterceptThreat(threat)) {
-            Missile* interceptor = selectBestInterceptor(threat);
+            InterceptorMissile* interceptor = selectBestInterceptor(threat);
             
             if (interceptor) {
                 std::cout << BOLD << MAGENTA << "🤖 AUTO-INTERCEPT ENGAGED: " 
@@ -210,14 +210,14 @@ bool MissileController::shouldInterceptThreat(const ThreatReport& threat) const 
     return threat.distanceToTarget <= autoInterceptThreshold;
 }
 
-Missile* MissileController::selectBestInterceptor(const ThreatReport& threat) {
+InterceptorMissile* MissileController::selectBestInterceptor(const ThreatReport& threat) {
     if (missiles.empty()) {
         return nullptr;
     }
 
     // For now, select the fastest available missile
     // You could enhance this with more sophisticated logic
-    Missile* bestMissile = &missiles[0];
+    InterceptorMissile* bestMissile = &missiles[0];
     
     for (auto& missile : missiles) {
         if (missile.getSpeed() > bestMissile->getSpeed()) {

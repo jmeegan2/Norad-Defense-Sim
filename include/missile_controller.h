@@ -3,18 +3,18 @@
 
 #include <vector>
 #include <algorithm>
-#include "missile.h"
+#include "interceptor_missile.h"
 #include "detection_system.h"
 
 class MissileController
 {
 public:
-    void addMissile(const Missile &missile);
+    void addMissile(const InterceptorMissile &missile);
     void moveAllMissiles(double dx, double dy, double dz);
     void printAllStatuses() const;
-    void launchMissile(Missile &missile, const Position &target);
-    Missile *getMissileById(int id);
-    bool removeMissileById(int id);
+    void launchMissile(InterceptorMissile &missile, const Position &target);
+    InterceptorMissile *getMissileById(int id);
+    bool removeDefensiveMissile(int id);
     void detectIncomingMissiles();
     int interceptThreat(const ThreatReport& threat);
     
@@ -31,7 +31,7 @@ public:
     bool hasAvailableMissiles() const;
 
 private:
-    std::vector<Missile> missiles;
+    std::vector<InterceptorMissile> missiles;
     
     // Auto-intercept settings
     bool autoInterceptEnabled = false;
@@ -42,7 +42,8 @@ private:
     // Helper methods
     std::vector<ThreatReport> prioritizeThreats(const std::vector<ThreatReport>& threats) const;
     bool shouldInterceptThreat(const ThreatReport& threat) const;
-    Missile* selectBestInterceptor(const ThreatReport& threat);
+    InterceptorMissile* selectBestInterceptor(const ThreatReport& threat);
+    
 };
 
 #endif

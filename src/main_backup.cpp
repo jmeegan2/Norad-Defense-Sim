@@ -81,7 +81,7 @@ void handleLaunchMissile(MissileController& controller, const std::vector<Target
     controller.printAllStatuses();
 
     int missileIdToLaunch = getChoice("\nEnter the ID of the missile to launch: ", 1, 999);
-    Missile* missileToLaunch = controller.getMissileById(missileIdToLaunch);
+    InterceptorMissile* missileToLaunch = controller.getMissileById(missileIdToLaunch);
 
     if (missileToLaunch) {
         std::cout << "\nAvailable Targets:\n";
@@ -185,7 +185,7 @@ void initializeSystem(MissileController& controller,
 
     // Add missiles to controller
     for (const auto& config : configs) {
-        controller.addMissile(Missile(
+        controller.addMissile(InterceptorMissile(
             missileId++,
             config.damage,
             config.name,
