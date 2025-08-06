@@ -51,6 +51,8 @@
         "variant": "cpp",
         "vector": "cpp",
         "algorithm": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "charconv": "cpp",
+        "iomanip": "cpp"
     }
 }

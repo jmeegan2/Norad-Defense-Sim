@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SOURCE_FILES="src/main.cpp src/missile.cpp src/missile_controller.cpp src/enemy_missile.cpp src/detection_system.cpp"
+SOURCE_FILES="src/main.cpp src/interceptor_missile.cpp src/missile_controller.cpp src/enemy_missile.cpp src/detection_system.cpp src/terminal_ui.cpp"
 EXECUTABLE="main"
 
 clang++ -std=c++17 -Iinclude -o $EXECUTABLE $SOURCE_FILES
