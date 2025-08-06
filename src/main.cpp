@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "missile_controller.h"
+#include "interceptor_controller.h"
 #include "enemy_missile.h"
 #include "detection_system.h"
 #include "target.h"
@@ -28,7 +28,7 @@ struct MissileConfig {
  * This function should ideally be part of the TerminalUI or a separate system manager.
  * For this refactor, let's keep it here for clarity.
  */
-void initializeSystem(MissileController &controller,
+void initializeSystem(InterceptorController &controller,
                       std::vector<EnemyMissile> &enemyMissiles,
                       const std::vector<Target> &targets) {
     int missileId = 1;
@@ -53,7 +53,7 @@ int main() {
     std::cout << BOLD << GREEN << "\nNORAD Missile System Engaged" << RESET << "\n";
 
     // System initialization
-    MissileController controller;
+    InterceptorController controller;
     std::vector<EnemyMissile> enemyMissiles;
     TerminalUI ui; // ⬅️ The single instance of TerminalUI
 

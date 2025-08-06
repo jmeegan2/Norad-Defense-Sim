@@ -1,12 +1,12 @@
-#ifndef MISSILE_CONTROLLER_H
-#define MISSILE_CONTROLLER_H
+#ifndef INTERCEPTOR_CONTROLLER_H
+#define INTERCEPTOR_CONTROLLER_H
 
 #include <vector>
 #include <algorithm>
 #include "interceptor_missile.h"
 #include "detection_system.h"
 
-class MissileController
+class InterceptorController
 {
 public:
     void addMissile(const InterceptorMissile &missile);

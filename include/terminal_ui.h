@@ -9,7 +9,7 @@
 #include <chrono>
 #include <iomanip>
 #include <cstdlib>
-#include "missile_controller.h"
+#include "interceptor_controller.h"
 #include "enemy_missile.h"  
 #include "detection_system.h"
 #include "target.h"
@@ -31,7 +31,7 @@ public:
     // Display methods
     void displayMainMenu() const;
     void displayAutoInterceptMenu() const;
-    void displayLiveBattlefield(const MissileController &controller,
+    void displayLiveBattlefield(const InterceptorController &controller,
                                const std::vector<EnemyMissile> &enemyMissiles,
                                const std::vector<Target> &targets,
                                const std::vector<ThreatReport> &threats) const;
@@ -40,17 +40,17 @@ public:
     int getChoice(const std::string &prompt, int min, int max) const;
     
     // Live view functionality
-    void runLiveView(MissileController &controller,
+    void runLiveView(InterceptorController &controller,
                     std::vector<EnemyMissile> &enemyMissiles,
                     const std::vector<Target> &targets,
                     DetectionSystem &radar) const;
 
     // New methods for handling main menu options
-    void handleLaunchMissile(MissileController &controller, const std::vector<Target> &targets) const;
-    void handleThreatDetection(MissileController &controller,
+    void handleLaunchMissile(InterceptorController &controller, const std::vector<Target> &targets) const;
+    void handleThreatDetection(InterceptorController &controller,
                                std::vector<EnemyMissile> &enemyMissiles,
                                DetectionSystem &radar) const;
-    void handleAutoInterceptMenu(MissileController &controller) const;
+    void handleAutoInterceptMenu(InterceptorController &controller) const;
 
     // Utility methods
     void clearScreen() const;

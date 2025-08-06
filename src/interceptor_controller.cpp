@@ -1,4 +1,4 @@
-#include "missile_controller.h"
+#include "interceptor_controller.h"
 #include <iostream>
 #include <algorithm>
 
@@ -11,12 +11,12 @@
 #define MAGENTA "\033[35m"
 
 // Existing methods (keeping your current implementations)
-void MissileController::addMissile(const InterceptorMissile &missile)
+void InterceptorController::addMissile(const InterceptorMissile &missile)
 {
     missiles.push_back(missile);
 }
 
-void MissileController::moveAllMissiles(double dx, double dy, double dz)
+void InterceptorController::moveAllMissiles(double dx, double dy, double dz)
 {
     for (auto &missile : missiles)
     {
@@ -24,7 +24,7 @@ void MissileController::moveAllMissiles(double dx, double dy, double dz)
     }
 }
 
-void MissileController::printAllStatuses() const
+void InterceptorController::printAllStatuses() const
 {
     std::cout << "\n";
     for (const auto &missile : missiles)
@@ -33,7 +33,7 @@ void MissileController::printAllStatuses() const
     }
 }
 
-void MissileController::launchMissile(InterceptorMissile &missile, const Position &targetCity)
+void InterceptorController::launchMissile(InterceptorMissile &missile, const Position &targetCity)
 {
     std::cout << "\n";
     int missileId = missile.getId();
@@ -59,7 +59,7 @@ void MissileController::launchMissile(InterceptorMissile &missile, const Positio
     }
 }
 
-bool MissileController::removeDefensiveMissile(int id)
+bool InterceptorController::removeDefensiveMissile(int id)
 {
     for (auto it = missiles.begin(); it != missiles.end(); ++it)
     {
@@ -72,7 +72,7 @@ bool MissileController::removeDefensiveMissile(int id)
     return false;
 }
 
-InterceptorMissile *MissileController::getMissileById(int id)
+InterceptorMissile *InterceptorController::getMissileById(int id)
 {
     for (InterceptorMissile &missile : missiles)
     {
@@ -84,7 +84,7 @@ InterceptorMissile *MissileController::getMissileById(int id)
     return nullptr;
 }
 
-int MissileController::interceptThreat(const ThreatReport& threat) {
+int InterceptorController::interceptThreat(const ThreatReport& threat) {
     if (missiles.empty()) {
         std::cout << RED << "No available missiles to launch an intercept!" << RESET << std::endl;
         return -1;
@@ -102,27 +102,27 @@ int MissileController::interceptThreat(const ThreatReport& threat) {
 
 // NEW AUTO-INTERCEPT METHODS
 
-void MissileController::setAutoIntercept(bool enabled) {
+void InterceptorController::setAutoIntercept(bool enabled) {
     autoInterceptEnabled = enabled;
     std::cout << CYAN << "Auto-intercept " << (enabled ? "ENABLED" : "DISABLED") << RESET << std::endl;
 }
 
-bool MissileController::isAutoInterceptEnabled() const {
+bool InterceptorController::isAutoInterceptEnabled() const {
     return autoInterceptEnabled;
 }
 
-void MissileController::setAutoInterceptThreshold(double threshold) {
+void InterceptorController::setAutoInterceptThreshold(double threshold) {
     autoInterceptThreshold = threshold;
     std::cout << CYAN << "Auto-intercept threshold set to " << threshold << " km" << RESET << std::endl;
 }
 
-void MissileController::setMaxAutoInterceptMissiles(int maxMissiles) {
+void InterceptorController::setMaxAutoInterceptMissiles(int maxMissiles) {
     maxAutoInterceptMissiles = maxMissiles;
     std::cout << CYAN << "Max auto-intercept missiles set to " << maxMissiles << RESET << std::endl;
 }
 
 // FIXED: Updated autoInterceptThreats method
-std::vector<int> MissileController::autoInterceptThreats(const std::vector<ThreatReport>& threats) {
+std::vector<int> InterceptorController::autoInterceptThreats(const std::vector<ThreatReport>& threats) {
     std::vector<int> interceptedEnemyIds;  // Track which enemies were actually intercepted
     
     if (!autoInterceptEnabled || threats.empty()) {
@@ -175,25 +175,25 @@ std::vector<int> MissileController::autoInterceptThreats(const std::vector<Threa
 
     return interceptedEnemyIds;
 }
-void MissileController::printAutoInterceptStatus() const {
-    std::cout << CYAN << "Auto-Intercept Status:" << RESET << std::endl;
+void InterceptorController::printAutoInterceptStatus() const {
+    std::cout << CYAN << "\nAuto-Intercept Status:" << RESET << std::endl;
     std::cout << "  Enabled: " << (autoInterceptEnabled ? GREEN "YES" : RED "NO") << RESET << std::endl;
     std::cout << "  Threshold: " << autoInterceptThreshold << " km" << std::endl;
     std::cout << "  Missiles Used: " << usedAutoInterceptMissiles << "/" << maxAutoInterceptMissiles << std::endl;
     std::cout << "  Available Missiles: " << getAvailableMissileCount() << std::endl;
 }
 
-int MissileController::getAvailableMissileCount() const {
+int InterceptorController::getAvailableMissileCount() const {
     return missiles.size();
 }
 
-bool MissileController::hasAvailableMissiles() const {
+bool InterceptorController::hasAvailableMissiles() const {
     return !missiles.empty();
 }
 
 // PRIVATE HELPER METHODS
 
-std::vector<ThreatReport> MissileController::prioritizeThreats(const std::vector<ThreatReport>& threats) const {
+std::vector<ThreatReport> InterceptorController::prioritizeThreats(const std::vector<ThreatReport>& threats) const {
     std::vector<ThreatReport> prioritized = threats;
     
     // Sort by distance to target (closest threats first)
@@ -205,12 +205,12 @@ std::vector<ThreatReport> MissileController::prioritizeThreats(const std::vector
     return prioritized;
 }
 
-bool MissileController::shouldInterceptThreat(const ThreatReport& threat) const {
+bool InterceptorController::shouldInterceptThreat(const ThreatReport& threat) const {
     // Only intercept if threat is within our threshold distance
     return threat.distanceToTarget <= autoInterceptThreshold;
 }
 
-InterceptorMissile* MissileController::selectBestInterceptor(const ThreatReport& threat) {
+InterceptorMissile* InterceptorController::selectBestInterceptor(const ThreatReport& threat) {
     if (missiles.empty()) {
         return nullptr;
     }

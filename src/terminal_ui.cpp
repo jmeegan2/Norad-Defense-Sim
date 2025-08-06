@@ -64,14 +64,14 @@ void TerminalUI::displayMainMenu() const
 void TerminalUI::displayAutoInterceptMenu() const
 {
     std::cout << "\n" << BOLD << CYAN << "Auto-Intercept Configuration:" << RESET << std::endl;
-    std::cout << "\n1. Toggle Auto-Intercept\n";
+    std::cout << "1. Toggle Auto-Intercept\n";
     std::cout << "2. Set Distance Threshold\n";
     std::cout << "3. Set Max Auto-Intercept Missiles\n";
     std::cout << "4. Reset Usage Counter\n";
     std::cout << "5. Back to Main Menu\n";
 }
 
-void TerminalUI::displayLiveBattlefield(const MissileController &controller,
+void TerminalUI::displayLiveBattlefield(const InterceptorController &controller,
                                        const std::vector<EnemyMissile> &enemyMissiles,
                                        const std::vector<Target> &targets,
                                        const std::vector<ThreatReport> &threats) const
@@ -147,12 +147,11 @@ void TerminalUI::displayLiveBattlefield(const MissileController &controller,
     std::cout << CYAN << "Press Ctrl+C to return to menu..." << RESET << std::endl;
 }
 
-void TerminalUI::runLiveView(MissileController &controller,
+void TerminalUI::runLiveView(InterceptorController &controller,
                             std::vector<EnemyMissile> &enemyMissiles,
                             const std::vector<Target> &targets,
                             DetectionSystem &radar) const
 {
-    clearScreen();
     std::cout << BOLD << GREEN << "Entering Live View Mode..." << RESET << std::endl;
     if (controller.isAutoInterceptEnabled())
     {
@@ -202,12 +201,12 @@ void TerminalUI::runLiveView(MissileController &controller,
     }
 }
 
-void TerminalUI::handleAutoInterceptMenu(MissileController &controller) const
+void TerminalUI::handleAutoInterceptMenu(InterceptorController &controller) const
 {
     while (true)
     {
-        displayAutoInterceptMenu();
         controller.printAutoInterceptStatus();
+        displayAutoInterceptMenu();
 
         int choice = getChoice("\nChoose option: ", 1, 5);
 
@@ -254,7 +253,7 @@ void TerminalUI::handleAutoInterceptMenu(MissileController &controller) const
 /**
  * Handles the missile launch process including target selection.
  */
-void TerminalUI::handleLaunchMissile(MissileController &controller, const std::vector<Target> &targets) const
+void TerminalUI::handleLaunchMissile(InterceptorController &controller, const std::vector<Target> &targets) const
 {
     controller.printAllStatuses();
 
@@ -282,7 +281,7 @@ void TerminalUI::handleLaunchMissile(MissileController &controller, const std::v
 /**
  * Handles threat detection and interception process.
  */
-void TerminalUI::handleThreatDetection(MissileController &controller,
+void TerminalUI::handleThreatDetection(InterceptorController &controller,
                                        std::vector<EnemyMissile> &enemyMissiles,
                                        DetectionSystem &radar) const
 {
