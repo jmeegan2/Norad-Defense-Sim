@@ -179,48 +179,57 @@ void displayLiveBattlefield(const MissileController &controller,
 
 // Update your live view to include auto-intercept
 // FIXED: Updated live view
-void runLiveView(MissileController& controller, 
-                std::vector<EnemyMissile>& enemyMissiles,
-                const std::vector<Target>& targets,
-                DetectionSystem& radar) {
-    
+void runLiveView(MissileController &controller,
+                 std::vector<EnemyMissile> &enemyMissiles,
+                 const std::vector<Target> &targets,
+                 DetectionSystem &radar)
+{
+
     clearScreen();
     std::cout << BOLD << GREEN << "Entering Live View Mode..." << RESET << std::endl;
-    if (controller.isAutoInterceptEnabled()) {
+    if (controller.isAutoInterceptEnabled())
+    {
         std::cout << BOLD << MAGENTA << "🤖 Auto-intercept is ACTIVE" << RESET << std::endl;
     }
     std::cout << "Press Ctrl+C to exit" << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(2));
-    
-    try {
-        while (true) {
+
+    try
+    {
+        while (true)
+        {
             // Update enemy missile positions
-            for (auto& enemy : enemyMissiles) {
+            for (auto &enemy : enemyMissiles)
+            {
                 enemy.move();
             }
-            
+
             // Scan for threats
             std::vector<ThreatReport> threats = radar.scanForThreats();
-            
+
             // AUTO-INTERCEPT IN LIVE VIEW (FIXED)
-            if (!threats.empty() && controller.isAutoInterceptEnabled()) {
+            if (!threats.empty() && controller.isAutoInterceptEnabled())
+            {
                 std::vector<int> interceptedIds = controller.autoInterceptThreats(threats);
-                
+
                 // Remove only the actually intercepted missiles
-                for (int enemyId : interceptedIds) {
+                for (int enemyId : interceptedIds)
+                {
                     removeEnemyMissileById(enemyMissiles, enemyId);
                 }
             }
-            
+
             // Rescan after potential interceptions
             threats = radar.scanForThreats();
-            
+
             // Display the battlefield
             displayLiveBattlefield(controller, enemyMissiles, targets, threats);
-            
+
             std::this_thread::sleep_for(std::chrono::milliseconds(1500));
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
         clearScreen();
         std::cout << YELLOW << "Exiting live view..." << RESET << std::endl;
     }
@@ -256,60 +265,71 @@ void handleLaunchMissile(MissileController &controller, const std::vector<Target
 /**
  * Handles threat detection and interception process
  */
-void handleThreatDetection(MissileController& controller, 
-                          std::vector<EnemyMissile>& enemyMissiles, 
-                          DetectionSystem& radar) {
+void handleThreatDetection(MissileController &controller,
+                           std::vector<EnemyMissile> &enemyMissiles,
+                           DetectionSystem &radar)
+{
     std::cout << BOLD << CYAN << "Scanning for threats..." << RESET << std::endl;
-    
+
     // Update enemy missile positions
-    for (auto& enemy : enemyMissiles) {
+    for (auto &enemy : enemyMissiles)
+    {
         enemy.move();
     }
 
     std::vector<ThreatReport> threats = radar.scanForThreats();
 
-    if (threats.empty()) {
+    if (threats.empty())
+    {
         std::cout << GREEN << "No threats detected." << RESET << std::endl;
         return;
     }
 
     // AUTO-INTERCEPT CHECK (FIXED)
-    if (controller.isAutoInterceptEnabled()) {
+    if (controller.isAutoInterceptEnabled())
+    {
         std::cout << YELLOW << "Auto-intercept system analyzing threats..." << RESET << std::endl;
         std::vector<int> interceptedEnemyIds = controller.autoInterceptThreats(threats);
-        
+
         // Remove ONLY the actually intercepted enemy missiles
-        for (int enemyId : interceptedEnemyIds) {
-            if (removeEnemyMissileById(enemyMissiles, enemyId)) {
-                std::cout << GREEN << "✅ Enemy missile #" << enemyId 
+        for (int enemyId : interceptedEnemyIds)
+        {
+            if (removeEnemyMissileById(enemyMissiles, enemyId))
+            {
+                std::cout << GREEN << "✅ Enemy missile #" << enemyId
                           << " successfully auto-intercepted and removed" << RESET << std::endl;
-            } else {
+            }
+            else
+            {
                 std::cout << RED << "❌ Failed to remove enemy missile #" << enemyId << RESET << std::endl;
             }
         }
-        
+
         // If auto-intercept handled some threats, update the threats list for display
-        if (!interceptedEnemyIds.empty()) {
+        if (!interceptedEnemyIds.empty())
+        {
             // Remove intercepted threats from display list
             threats.erase(
                 std::remove_if(threats.begin(), threats.end(),
-                    [&interceptedEnemyIds](const ThreatReport& threat) {
-                        return std::find(interceptedEnemyIds.begin(), interceptedEnemyIds.end(), 
-                                       threat.enemyId) != interceptedEnemyIds.end();
-                    }),
-                threats.end()
-            );
-            
+                               [&interceptedEnemyIds](const ThreatReport &threat)
+                               {
+                                   return std::find(interceptedEnemyIds.begin(), interceptedEnemyIds.end(),
+                                                    threat.enemyId) != interceptedEnemyIds.end();
+                               }),
+                threats.end());
+
             // Rescan for remaining threats after position updates
             threats = radar.scanForThreats();
         }
     }
 
     // Display remaining threats for manual handling
-    if (!threats.empty()) {
+    if (!threats.empty())
+    {
         std::cout << BOLD << RED << "Remaining Threats Detected!" << RESET << std::endl;
-        for (size_t i = 0; i < threats.size(); ++i) {
-            const auto& threat = threats[i];
+        for (size_t i = 0; i < threats.size(); ++i)
+        {
+            const auto &threat = threats[i];
             std::cout << i + 1 << ". ID: " << threat.detectionId
                       << ", Enemy: " << threat.enemyId
                       << ", To: " << threat.targetName
@@ -317,19 +337,23 @@ void handleThreatDetection(MissileController& controller,
                       << ", Speed: " << static_cast<int>(threat.calculatedSpeed) << " m/s" << std::endl;
         }
 
-        int interceptChoice = getChoice("\nChoose a threat to manually intercept (by number), or 0 to cancel: ", 
-                                       0, threats.size());
-        
-        if (interceptChoice != 0) {
-            const ThreatReport& chosenThreat = threats[interceptChoice - 1];
+        int interceptChoice = getChoice("\nChoose a threat to manually intercept (by number), or 0 to cancel: ",
+                                        0, threats.size());
+
+        if (interceptChoice != 0)
+        {
+            const ThreatReport &chosenThreat = threats[interceptChoice - 1];
             int enemyMissileId = controller.interceptThreat(chosenThreat);
 
-            if (removeEnemyMissileById(enemyMissiles, enemyMissileId)) {
-                std::cout << GREEN << "\n✅ Enemy missile #" << enemyMissileId 
+            if (removeEnemyMissileById(enemyMissiles, enemyMissileId))
+            {
+                std::cout << GREEN << "\n✅ Enemy missile #" << enemyMissileId
                           << " has been manually intercepted and removed." << RESET << std::endl;
             }
         }
-    } else if (controller.isAutoInterceptEnabled()) {
+    }
+    else if (controller.isAutoInterceptEnabled())
+    {
         std::cout << GREEN << "All detected threats have been auto-intercepted!" << RESET << std::endl;
     }
 }
@@ -468,7 +492,7 @@ int main()
     while (running)
     {
         displayMenu();
-        MenuOption choice = static_cast<MenuOption>(getChoice("\nChoose an option: ", 1, 5));
+        MenuOption choice = static_cast<MenuOption>(getChoice("\nChoose an option: ", LIST, EXIT));
 
         switch (choice)
         {
